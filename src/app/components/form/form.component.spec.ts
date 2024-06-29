@@ -1,137 +1,13 @@
-// import { ComponentFixture, TestBed } from '@angular/core/testing';
-// import { FormComponent } from './form.component';
-// import { ReactiveFormsModule } from '@angular/forms';
-// import { By } from '@angular/platform-browser';
-
-// describe('FormComponent', () => {
-//   let component: FormComponent;
-//   let fixture: ComponentFixture<FormComponent>;
-
-//   beforeEach(async () => {
-//     await TestBed.configureTestingModule({
-//       // declarations: [FormComponent],
-//       imports: [FormComponent,ReactiveFormsModule]
-//     }).compileComponents();
-//   });
-
-//   beforeEach(() => {
-//     fixture = TestBed.createComponent(FormComponent);
-//     component = fixture.componentInstance;
-//     fixture.detectChanges();
-//   });
-
-//   it('should create', () => {
-//     expect(component).toBeTruthy();
-//   });
-
-//   it('form should be invalid when empty', () => {
-//     expect(component.signupForm.valid).toBeFalsy();
-//   });
-
-//   it('name field validity', () => {
-//     let errors;
-//     let name = component.signupForm.controls['name'];
-//     expect(name.valid).toBeFalsy();
-
-//     // Name field is required
-//     errors = name.errors || {};
-//     expect(errors['required']).toBeTruthy();
-
-//     // Set name to valid value
-//     name.setValue('Test Name');
-//     errors = name.errors || {};
-//     expect(errors['required']).toBeFalsy();
-//   });
-
-//   it('email field validity', () => {
-//     let errors;
-//     let email = component.signupForm.controls['email'];
-//     expect(email.valid).toBeFalsy();
-
-//     // Email field is required
-//     errors = email.errors || {};
-//     expect(errors['required']).toBeTruthy();
-
-//     // Set invalid email
-//     email.setValue('invalid-email');
-//     errors = email.errors || {};
-//     expect(errors['email']).toBeTruthy();
-
-//     // Set valid email
-//     email.setValue('test@example.com');
-//     errors = email.errors || {};
-//     expect(errors['email']).toBeFalsy();
-//   });
-
-//   it('password field validity', () => {
-//     let errors;
-//     let password = component.signupForm.controls['password'];
-//     expect(password.valid).toBeFalsy();
-
-//     // Password field is required
-//     errors = password.errors || {};
-//     expect(errors['required']).toBeTruthy();
-
-//     // Set invalid password (less than 6 characters)
-//     password.setValue('12345');
-//     errors = password.errors || {};
-//     expect(errors['minlength']).toBeTruthy();
-
-//     // Set valid password
-//     password.setValue('securepassword');
-//     errors = password.errors || {};
-//     expect(errors['minlength']).toBeFalsy();
-//   });
-
-//   it('confirmPassword field validity', () => {
-//     let confirmPassword = component.signupForm.controls['confirmPassword'];
-//     expect(confirmPassword.valid).toBeFalsy();
-
-//     // Set valid confirm password (same as password)
-//     component.signupForm.controls['password'].setValue('securepassword');
-//     confirmPassword.setValue('securepassword');
-//     expect(component.signupForm.valid).toBeTruthy();
-
-//     // Set invalid confirm password (different from password)
-//     confirmPassword.setValue('differentpassword');
-//     expect(component.signupForm.valid).toBeFalsy();
-//   });
-
-//   it('should emit toggle event on calling onToggle', () => {
-//     spyOn(component.toggle, 'emit');
-//     component.onToggle();
-//     expect(component.toggle.emit).toHaveBeenCalled();
-//   });
-
-//   it('submitting the form', () => {
-//     expect(component.signupForm.valid).toBeFalsy();
-//     component.signupForm.controls['name'].setValue('Test Name');
-//     component.signupForm.controls['email'].setValue('test@example.com');
-//     component.signupForm.controls['password'].setValue('securepassword');
-//     component.signupForm.controls['confirmPassword'].setValue('securepassword');
-//     expect(component.signupForm.valid).toBeTruthy();
-
-//     // Trigger form submission
-//     let compiled = fixture.nativeElement;
-//     compiled.querySelector('form').dispatchEvent(new Event('ngSubmit'));
-//     fixture.detectChanges();
-
-//     // Expect console log to have been called with the form value
-//     spyOn(console, 'log');
-//     component.onSubmit();
-//     expect(console.log).toHaveBeenCalledWith(component.signupForm.value);
-//   });
-// });
-
-
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormComponent } from './form.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
+import { DebugElement } from '@angular/core';
 
 describe('FormComponent', () => {
   let component: FormComponent;
   let fixture: ComponentFixture<FormComponent>;
+  let debugElement: DebugElement;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -143,111 +19,78 @@ describe('FormComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(FormComponent);
     component = fixture.componentInstance;
+    debugElement = fixture.debugElement;
     fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('should create the form with 4 controls', () => {
+    expect(component.signupForm.contains('name')).toBeTruthy();
+    expect(component.signupForm.contains('email')).toBeTruthy();
+    expect(component.signupForm.contains('password')).toBeTruthy();
+    expect(component.signupForm.contains('confirmPassword')).toBeTruthy();
   });
 
-  it('form should be invalid when empty', () => {
-    expect(component.signupForm.valid).toBeFalsy();
+  it('should make the name control required', () => {
+    let control = component.signupForm.get('name');
+    control?.setValue('');
+    expect(control?.valid).toBeFalsy();
   });
 
-  it('name field validity', () => {
-    let errors;
-    let name = component.signupForm.controls['name'];
-    expect(name.valid).toBeFalsy();
+  it('should make the email control required and validate email format', () => {
+    let control = component.signupForm.get('email');
+    control?.setValue('');
+    expect(control?.valid).toBeFalsy();
 
-    // Name field is required
-    errors = name.errors || {};
-    expect(errors['required']).toBeTruthy();
-
-    // Set name to valid value
-    name.setValue('Test Name');
-    errors = name.errors || {};
-    expect(errors['required']).toBeFalsy();
+    control?.setValue('invalidEmail');
+    expect(control?.valid).toBeFalsy();
   });
 
-  it('email field validity', () => {
-    let errors;
-    let email = component.signupForm.controls['email'];
-    expect(email.valid).toBeFalsy();
+  it('should make the password control required and validate min length', () => {
+    let control = component.signupForm.get('password');
+    control?.setValue('');
+    expect(control?.valid).toBeFalsy();
 
-    // Email field is required
-    errors = email.errors || {};
-    expect(errors['required']).toBeTruthy();
+    control?.setValue('12345');
+    expect(control?.valid).toBeFalsy();
 
-    // Set invalid email
-    email.setValue('invalid-email');
-    errors = email.errors || {};
-    expect(errors['email']).toBeTruthy();
-
-    // Set valid email
-    email.setValue('test@example.com');
-    errors = email.errors || {};
-    expect(errors['email']).toBeFalsy();
+    control?.setValue('123456');
+    expect(control?.valid).toBeTruthy();
   });
 
-  it('password field validity', () => {
-    let errors;
-    let password = component.signupForm.controls['password'];
-    expect(password.valid).toBeFalsy();
-
-    // Password field is required
-    errors = password.errors || {};
-    expect(errors['required']).toBeTruthy();
-
-    // Set invalid password (less than 6 characters)
-    password.setValue('12345');
-    errors = password.errors || {};
-    expect(errors['minlength']).toBeTruthy();
-
-    // Set valid password
-    password.setValue('securepassword');
-    errors = password.errors || {};
-    expect(errors['minlength']).toBeFalsy();
-  });
-
-  it('confirmPassword field validity', () => {
-    let errors;
-    let confirmPassword = component.signupForm.controls['confirmPassword'];
-    expect(confirmPassword.valid).toBeFalsy();
-
-    // Set invalid confirm password (different from password)
-    confirmPassword.setValue('differentpassword');
-    errors = confirmPassword.errors || {};
-    expect(errors['required']).toBeTruthy();
-
-    // Set valid confirm password (same as password)
-    component.signupForm.controls['password'].setValue('securepassword');
-    confirmPassword.setValue('securepassword');
-    errors = confirmPassword.errors || {};
-    expect(errors['required']).toBeFalsy();
-
-    expect(component.signupForm.valid).toBeTruthy();
+  it('should make the confirmPassword control required', () => {
+    let control = component.signupForm.get('confirmPassword');
+    control?.setValue('');
+    expect(control?.valid).toBeFalsy();
   });
 
   it('should emit toggle event on calling onToggle', () => {
     spyOn(component.toggle, 'emit');
+
     component.onToggle();
+
     expect(component.toggle.emit).toHaveBeenCalled();
   });
 
-  it('submitting the form', () => {
-    expect(component.signupForm.valid).toBeFalsy();
-    component.signupForm.controls['name'].setValue('Test Name');
-    component.signupForm.controls['email'].setValue('test@example.com');
-    component.signupForm.controls['password'].setValue('securepassword');
-    component.signupForm.controls['confirmPassword'].setValue('securepassword');
-    expect(component.signupForm.valid).toBeTruthy();
-
-    // Spy on console.log before triggering form submission
+  it('should log form value on submit', () => {
     spyOn(console, 'log');
+    
+    component.signupForm.setValue({
+      name: 'Test User',
+      email: 'test@example.com',
+      password: '123456',
+      confirmPassword: '123456'
+    });
 
-    // Trigger form submission
     component.onSubmit();
 
     expect(console.log).toHaveBeenCalledWith(component.signupForm.value);
+  });
+
+  it('should disable the submit button if the form is invalid', () => {
+    component.signupForm.get('name')?.setValue('');
+    fixture.detectChanges();
+
+    const submitButton: HTMLButtonElement = debugElement.query(By.css('.signup-btn')).nativeElement;
+    expect(submitButton.disabled).toBeTruthy();
   });
 });

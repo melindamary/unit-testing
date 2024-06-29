@@ -25,6 +25,9 @@
         
         <label for="confirm-password">Confirm Password:</label>
         <input type="password" formControlName="confirmPassword" required>
+        <div *ngIf="signupForm.get('confirm-password')?.invalid && signupForm.get('confirm-password')?.touched">
+            <span *ngIf="signupForm.get('confirm-password')?.hasError('required')" style="color:Red;">*Confirm password should have minimum 6 characters</span>
+        </div>
         
         <button class="signup-btn" [disabled]="signupForm.invalid" type="submit">Signup</button>
     </form>
